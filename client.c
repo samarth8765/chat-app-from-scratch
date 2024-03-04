@@ -1,5 +1,7 @@
 #include "socketutil.h"
 
+#define true 1
+
 int main()
 {
     int a = 4;
@@ -11,7 +13,7 @@ int main()
     }
     printf("Socket FD is %d\n", socket_FD);
 
-    struct sockaddr_in *address = createIPV4Address("127.0.0.1", 8080);
+    struct sockaddr_in *address = createIPV4Address("127.0.0.1", 2001);
 
     int res = connect(socket_FD, (struct sockaddr *)address, sizeof(*address));
 
@@ -26,13 +28,24 @@ int main()
         return -1;
     }
 
-    char *message = "GET / HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
-    send(socket_FD, message, strlen(message), 0);
+    char *message = NULL;
+    size_t message_len = 0;
+    printf("Type the message and send\n");
 
-    char recv_msg[1024];
-    recv(socket_FD, recv_msg, 1024, 0);
-    printf("Response\n %s", recv_msg);
-    free(address);
+    while (true)
+    {
+        ssize_t charCount = getline(&message, &message_len, stdin);
+        if (charCount > 0 && strcmp(message, "exit\n") == 0)
+        {
+            break;
+        }
+        else
+        {
+            ssize_t messageSent = send(socket_FD, message, charCount, 0);
+        }
+    }
+
+    close(socket_FD);
 
     return 0;
 }
