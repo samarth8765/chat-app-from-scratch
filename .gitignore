@@ -1,3 +1,6 @@
 .vscode
 dist
 node_modules
+*.out
+client
+serv

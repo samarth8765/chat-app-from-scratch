@@ -4,7 +4,6 @@
 
 int main()
 {
-    int a = 4;
     int socket_FD = createTCPIpv4socket();
     if (socket_FD < 0)
     {
@@ -14,7 +13,6 @@ int main()
     printf("Socket FD is %d\n", socket_FD);
 
     struct sockaddr_in *address = createIPV4Address("127.0.0.1", 2001);
-
     int res = connect(socket_FD, (struct sockaddr *)address, sizeof(*address));
 
     if (res == 0)
@@ -36,15 +34,14 @@ int main()
     {
         ssize_t charCount = getline(&message, &message_len, stdin);
         if (charCount > 0 && strcmp(message, "exit\n") == 0)
-        {
             break;
-        }
         else
         {
             ssize_t messageSent = send(socket_FD, message, charCount, 0);
         }
     }
 
+    free(address);
     close(socket_FD);
 
     return 0;
