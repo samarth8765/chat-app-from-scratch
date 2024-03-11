@@ -26,20 +26,9 @@ int main()
         return -1;
     }
 
-    char *message = NULL;
-    size_t message_len = 0;
-    printf("Type the message and send\n");
+    recieveMessageFromServer(socket_FD);
 
-    while (true)
-    {
-        ssize_t charCount = getline(&message, &message_len, stdin);
-        if (charCount > 0 && strcmp(message, "exit\n") == 0)
-            break;
-        else
-        {
-            ssize_t messageSent = send(socket_FD, message, charCount, 0);
-        }
-    }
+    sendMessageToServer(socket_FD);
 
     free(address);
     close(socket_FD);

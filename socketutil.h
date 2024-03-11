@@ -19,6 +19,8 @@ struct AcceptedSocket
     bool successfull;
 };
 
+// can include struct not static values?
+
 int createTCPIpv4socket();
 struct sockaddr_in *createIPV4Address(char *ip, int PORT);
 struct AcceptedSocket *acceptedClient(int __sid);
@@ -27,5 +29,9 @@ void recieveMessageOnThread(int __fd);
 void recieveMessageFromClient(int __fd);
 void recieveMessageFromClient(int __fd);
 void broadCastMessage(char *buffer, int __fd);
+
+void printMessageFromServer(int __fd);
+void recieveMessageFromServer(int __fd);
+void sendMessageToServer(int __fd);
 
 #endif

@@ -1,4 +1,5 @@
 #include "socketutil.h"
+
 struct AcceptedSocket *clientSockets[10];
 ssize_t clientSocketsCount = 0;
 
@@ -73,11 +74,12 @@ void recieveMessageFromClient(int __fd)
         if (recvResult > 0)
         {
             buffer[recvResult] = '\0';
-            printf("Response from buffer %s", buffer);
+            printf("%s", buffer);
             broadCastMessage(buffer, __fd);
         }
-        else
+        else if (recvResult == -1)
         {
+            // manage the broadcast if client exits
             break;
         }
     }
@@ -86,11 +88,80 @@ void recieveMessageFromClient(int __fd)
 
 void broadCastMessage(char *buffer, int __fd)
 {
+    printf("%d", clientSocketsCount);
     for (int i = 0; i < clientSocketsCount; i++)
     {
         if (clientSockets[i]->__fd != __fd)
         {
             send(clientSockets[i]->__fd, buffer, strlen(buffer), 0);
+        }
+    }
+}
+
+void printMessageFromServer(int __fd)
+{
+    char buffer[1024];
+
+    while (true)
+    {
+        ssize_t amountReceived = recv(__fd, buffer, 1024, 0);
+
+        if (amountReceived > 0)
+        {
+            buffer[amountReceived] = 0;
+            printf("%s", buffer);
+        }
+
+        if (amountReceived == 0)
+            break;
+    }
+
+    close(__fd);
+}
+
+void recieveMessageFromServer(int __fd)
+{
+    pthread_t id;
+    pthread_create(&id, NULL, printMessageFromServer, __fd);
+}
+
+void sendMessageToServer(int __fd)
+{
+    /*Get username from user*/
+    char *buffer;
+    size_t buffer_len = 0;
+    ssize_t usernameCount = 0;
+    while (true)
+    {
+        printf("Please enter your name\n");
+        usernameCount = getline(&buffer, &buffer_len, stdin);
+        if (usernameCount == 1 && buffer[0] == '\n')
+        {
+            continue;
+        }
+        else
+        {
+            buffer[usernameCount - 1] = ':';
+            buffer[usernameCount] = ' ';
+            buffer[usernameCount + 1] = '\0';
+            break;
+        }
+    }
+
+    char *message = NULL;
+    size_t message_len = 0;
+    printf("Type the message and send\n");
+    while (true)
+    {
+        ssize_t charCount = getline(&message, &message_len, stdin);
+        if (charCount > 0 && strcmp(message, "exit\n") == 0)
+            break;
+        else
+        {
+            buffer = realloc(buffer, usernameCount + 1 + charCount);
+            strcat(buffer, message);
+            ssize_t messageSent = send(__fd, buffer, strlen(buffer), 0);
+            buffer[usernameCount + 1] = '\0';
         }
     }
 }

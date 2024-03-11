@@ -1,5 +1,4 @@
 #include "socketutil.h"
-
 #define true 1
 
 int main()
@@ -14,7 +13,7 @@ int main()
     }
     else
     {
-        perror("Bind failed\n");
+        perror("Bind failed");
         return -1;
     }
 
